@@ -1,0 +1,12 @@
+﻿  main.cpp
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(59,39): warning C4305: '+=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(93,27): warning C4305: '+=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(94,32): warning C4305: '-=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(97,27): warning C4305: '+=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(98,32): warning C4305: '-=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(102,27): warning C4305: '+=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(103,19): warning C4305: '-=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(137,36): warning C4244: 'argument': conversion from 'GLfloat' to 'int', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(137,21): warning C4244: 'argument': conversion from 'GLfloat' to 'int', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project2\main.cpp(236,34): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Project2.vcxproj -> D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Debug\Project2.exe

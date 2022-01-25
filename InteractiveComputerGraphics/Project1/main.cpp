@@ -1,4 +1,6 @@
 #include <GL/freeglut.h>
+#include <GL/freeglut.h>
+#include <iostream>
 #include <stdlib.h>
 
 void resize(int w, int h)
@@ -42,8 +44,7 @@ int main(int argc, char* argv[]) {
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.36f, 0.619f, 0.98f, 1.0f);
 
-	// key detection
-	glutKeyboardFunc(keyboard);
+	
 
 	// GLUT function initiliazation
 	glutDisplayFunc(display);
