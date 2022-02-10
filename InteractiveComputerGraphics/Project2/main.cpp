@@ -39,7 +39,7 @@ GLfloat display_height = 600;
 cyMatrix4f GetModelViewProjection();
 void InitializeGLUT(int argc, char* argv[]);
 GLuint BuildVertexBuffer(int argc, const char* filename);
-void CompileLinkShaders();
+void CompileProgram();
 void SetShaderVariables();
 
 #pragma endregion globals 
@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 	// set everything up - initialize glut, read obj and fill vertex buffer, compile and link shaders, set uniform and sttribute variables
 	InitializeGLUT(argc, argv);
 	GLuint vbo_id = BuildVertexBuffer(argc, argv[1]);
-	CompileLinkShaders();
+	CompileProgram();
 
 	SetShaderVariables();
 
@@ -195,7 +195,7 @@ GLuint BuildVertexBuffer(int argc, const char* filename) {
 	return vbo_id;
 }
 
-void CompileLinkShaders() {
+void CompileProgram() {
 	cyGLSLShader v;
 	cyGLSLShader f;
 	bool result;

@@ -163,7 +163,6 @@
     <ClInclude Include="cyMatrix.h" />
     <ClInclude Include="cyTriMesh.h" />
     <ClInclude Include="cyVector.h" />
-    <ClInclude Include="Transformations.h" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="teapot.obj">
