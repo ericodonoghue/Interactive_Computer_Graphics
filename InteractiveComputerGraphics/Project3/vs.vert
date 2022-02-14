@@ -12,7 +12,7 @@ out vec4 frag_pos;
 void main()
 {
 	frag_pos = mvn * vec4(pos, 1);
-	frag_norm = (vec4(norm,0) * transpose(inverse(mvn))).xyz;
+	frag_norm = (transpose(inverse(mvn)) * vec4(norm,0)).xyz;
 
 	gl_Position = mvp * vec4(pos, 1);
 }

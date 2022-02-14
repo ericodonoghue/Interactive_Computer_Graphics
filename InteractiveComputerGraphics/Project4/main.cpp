@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include "lodepng.h"
 #include "cyCore.h"
 #include "cyVector.h"
 #include "cyMatrix.h"
@@ -12,6 +13,8 @@
 #pragma region globals 
 int num_v; // number of vertices in given obj
 int num_f; // number of faces in given obj
+unsigned img_width = 512;
+unsigned img_height = 512;
 
 // rotation and zoom with mouse
 float t_z = -48;
@@ -38,8 +41,9 @@ GLfloat display_height = 600;
 
 // forward declarations
 void InitializeGLUT(int argc, char* argv[]);
-GLuint* BuildVertexBuffer(int argc, const char* filename);
+GLuint* BuildBuffers(int argc, const char* filename);
 void CompileProgram();
+void InitializeTexture();
 void SetShaderVariables();
 cyMatrix4f GetModelViewProjection();
 cyMatrix4f GetModelViewNormal();
@@ -121,7 +125,8 @@ int main(int argc, char* argv[]) {
 	// set everything up - initialize glut, read obj and fill vertex buffer, compile and link shaders, set uniform and sttribute variables
 	InitializeGLUT(argc, argv);
 	CompileProgram();
-	GLuint* vbo = BuildVertexBuffer(argc, argv[1]);
+	GLuint* vbo = BuildBuffers(argc, argv[1]);
+	InitializeTexture();
 	SetShaderVariables();
 	
 	// start 
@@ -129,6 +134,7 @@ int main(int argc, char* argv[]) {
 
 	glDeleteBuffers(1, &vbo[0]);
 	glDeleteBuffers(1, &vbo[1]);
+	glDeleteBuffers(1, &vbo[2]);
 
 	return 0;
 }
@@ -179,7 +185,7 @@ void CompileProgram() {
 	program.Bind();
 }
 
-GLuint* BuildVertexBuffer(int argc, const char* filename) {
+GLuint* BuildBuffers(int argc, const char* filename) {
 	// input sanitization
 	if (argc != 2) {
 		fprintf(stderr, "Error: invalid arguments, expected - 2");
@@ -189,7 +195,7 @@ GLuint* BuildVertexBuffer(int argc, const char* filename) {
 	// read vertex data
 	bool r;
 	cyTriMesh reader;
-	if (!(r = reader.LoadFromFileObj(filename, false))) {
+	if (!(r = reader.LoadFromFileObj(filename))) {
 		fprintf(stderr, "Error: cannot read file");
 		exit(1);
 	}
@@ -212,27 +218,59 @@ GLuint* BuildVertexBuffer(int argc, const char* filename) {
 		n[3 * i + 2] = reader.VN(fn.v[2]);
 	}
 
+	cyVec3f* t = new cyVec3f[num_f * 3];
+	for (int i = 0; i < num_f; i++) {
+		cyTriMesh::TriFace ft = reader.FT(i);
+		t[3 * i + 0] = reader.VT(ft.v[0]);
+		t[3 * i + 1] = reader.VT(ft.v[1]);
+		t[3 * i + 2] = reader.VT(ft.v[2]);
+	}
+
 	// create and bind vertex buffer object with vertex data
-	GLuint vao, vbo[2];
+	GLuint vao, vbo[3];
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
-	glGenBuffers(2, vbo);
+	glGenBuffers(3, vbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	glBufferData(GL_ARRAY_BUFFER, num_f * 3 * sizeof(cyVec3f), v, GL_STATIC_DRAW);
-	
 	GLuint pos = glGetAttribLocation(program_id, "pos");
 	glEnableVertexAttribArray(pos);
 	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
+
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
 	glBufferData(GL_ARRAY_BUFFER, num_f * 3 * sizeof(cyVec3f), n, GL_STATIC_DRAW);
-
 	GLuint norm = glGetAttribLocation(program_id, "norm");
 	glEnableVertexAttribArray(norm);
 	glVertexAttribPointer(norm, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
+	
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
+	glBufferData(GL_ARRAY_BUFFER, num_f * 3 * sizeof(cyVec3f), t, GL_STATIC_DRAW);
+	GLuint tcx = glGetAttribLocation(program_id, "tcx");
+	glVertexAttribPointer(tcx, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+	glEnableVertexAttribArray(tcx);
+
+	std::string file(reader.M(0).map_Kd);
+	std::vector<unsigned char> image;
+	unsigned error = lodepng::decode(image, img_width, img_height, file);
+	if (error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+
+	GLuint tex_id;
+	glGenTextures(1, &tex_id);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex_id);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img_width, img_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
 	return vbo;
+}
+
+void InitializeTexture() {
+	
 }
 
 void SetShaderVariables() {
