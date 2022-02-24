@@ -144,7 +144,7 @@ void InitializeGLUT(int argc, char* argv[]) {
 	glutInitContextFlags(GLUT_DEBUG);
 	glutInitWindowSize(display_width, display_height);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("CS 5610 Project 4");
+	glutCreateWindow("CS 5610 Project 3");
 
 	// key detection
 	glutKeyboardFunc(keyboard);
