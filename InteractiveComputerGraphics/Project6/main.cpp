@@ -35,7 +35,8 @@ cyGLSLProgram obj_program;
 GLuint obj_program_id;
 GLuint obj_vao;
 GLuint obj_mvp;
-GLuint obj_mvn;
+GLuint obj_mv;
+GLuint obj_f_mv;
 GLfloat display_width = 800;
 GLfloat display_height = 600;
 cyTriMesh obj_mesh;
@@ -60,7 +61,7 @@ void CompileProgram();
 void SetShaderVariables();
 void InitializeCubemap();
 cyMatrix4f GetModelViewProjection();
-cyMatrix4f GetModelViewNormal();
+cyMatrix4f GetModelView();
 cyMatrix4f GetCubeModelViewProjection();
 
 #pragma endregion globals 
@@ -101,11 +102,12 @@ void draw() {
 	
 	// calculate and set mvp/mvn matrix
 	float _mvp[16];
-	float _mvn[16];
+	float _mv[16];
 	GetModelViewProjection().Get(_mvp);
-	GetModelViewNormal().Get(_mvn);
+	GetModelView().Get(_mv);
 	glUniformMatrix4fv(obj_mvp, 1, false, _mvp);
-	glUniformMatrix4fv(obj_mvn, 1, false, _mvn);
+	glUniformMatrix4fv(obj_mv, 1, false, _mv);
+	//glUniformMatrix4fv(obj_f_mv, 1, false, _mv);
 
 	glBindVertexArray(obj_vao);
 
@@ -318,7 +320,7 @@ GLuint* BuildCubeBuffers() {
 void SetShaderVariables() {
 	glUseProgram(obj_program_id);
 	obj_mvp = glGetUniformLocation(obj_program_id, "mvp");	
-	obj_mvn = glGetUniformLocation(obj_program_id, "mvn");
+	obj_mv = glGetUniformLocation(obj_program_id, "mv");
 
 	glUseProgram(cube_program_id);
 	cube_mvp = glGetUniformLocation(cube_program_id, "mvp");
@@ -371,7 +373,7 @@ cyMatrix4f GetModelViewProjection() {
 	return (cyMatrix4f::Perspective(fov, aspect, n, f) * cyMatrix4f::Translation(cyVec3f(0, -5, obj_t_z))) * cyMatrix4f::RotationXYZ(obj_r_x, obj_r_y + auto_rot, 0);
 }
 
-cyMatrix4f GetModelViewNormal() {
+cyMatrix4f GetModelView() {
 	// generate translation and rotation matrices then multiply them
 	return cyMatrix4f::Translation(cyVec3f(0, -5, obj_t_z)) * cyMatrix4f::RotationXYZ(obj_r_x, obj_r_y + auto_rot, 0);
 }

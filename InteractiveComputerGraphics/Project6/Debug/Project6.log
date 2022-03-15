@@ -1,19 +1,24 @@
-﻿  main.cpp
+﻿  lodepng.cpp
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\lodepng.cpp(705,35): warning C4267: '=': conversion from 'size_t' to 'unsigned short', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\lodepng.cpp(729,37): warning C4267: '=': conversion from 'size_t' to 'unsigned short', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\lodepng.cpp(746,38): warning C4267: '=': conversion from 'size_t' to 'unsigned short', possible loss of data
+  main.cpp
 D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(19,20): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(71,18): warning C4244: '=': conversion from 'int' to 'GLfloat', possible loss of data
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(72,19): warning C4244: '=': conversion from 'int' to 'GLfloat', possible loss of data
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(79,39): warning C4305: '+=': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(140,31): warning C4305: '+=': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(141,36): warning C4305: '-=': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(144,31): warning C4305: '+=': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(145,36): warning C4305: '-=': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(149,31): warning C4305: '+=': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(150,23): warning C4305: '-=': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(189,36): warning C4244: 'argument': conversion from 'GLfloat' to 'int', possible loss of data
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(189,21): warning C4244: 'argument': conversion from 'GLfloat' to 'int', possible loss of data
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(350,21): warning C4018: '<': signed/unsigned mismatch
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(365,34): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(381,34): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(315): warning C4172: returning address of local variable or temporary: vbo
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(283): warning C4172: returning address of local variable or temporary: vbo
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(72,18): warning C4244: '=': conversion from 'int' to 'GLfloat', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(73,19): warning C4244: '=': conversion from 'int' to 'GLfloat', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(80,39): warning C4305: '+=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(142,31): warning C4305: '+=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(143,36): warning C4305: '-=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(146,31): warning C4305: '+=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(147,36): warning C4305: '-=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(151,31): warning C4305: '+=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(152,23): warning C4305: '-=': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(191,36): warning C4244: 'argument': conversion from 'GLfloat' to 'int', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(191,21): warning C4244: 'argument': conversion from 'GLfloat' to 'int', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(352,21): warning C4018: '<': signed/unsigned mismatch
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(367,34): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(383,34): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Generating Code...
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(317): warning C4172: returning address of local variable or temporary: vbo
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project6\main.cpp(285): warning C4172: returning address of local variable or temporary: vbo
   Project6.vcxproj -> D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Debug\Project6.exe
