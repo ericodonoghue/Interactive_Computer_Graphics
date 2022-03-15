@@ -12,17 +12,11 @@
 
 #pragma region globals 
 
-unsigned img_width = 512;
-unsigned img_height = 512;
 
 // rotation and zoom with mouse
 float obj_t_z = -48;
 float obj_r_x = -1.5708;
 float obj_r_y = 0;
-
-float plane_t_z = -4;
-float plane_r_x = -1;
-float plane_r_y = 0;
 
 // keeps track of the previous position of the mouse for zoom/rotation direction
 int pzy = 0;
@@ -40,9 +34,8 @@ cyGLSLProgram obj_program;
 GLuint obj_program_id;
 GLuint obj_vao;
 GLuint obj_mvp;
-GLuint obj_mvn;
-GLuint obj_mlp;
-GLuint obj_tex_id;
+GLuint obj_mv;
+GLuint obj_m_shadow;
 GLfloat display_width = 800;
 GLfloat display_height = 600;
 cyTriMesh obj_mesh;
@@ -54,34 +47,30 @@ cyGLSLProgram plane_program;
 GLuint plane_program_id;
 GLuint plane_vao;
 GLuint plane_mvp;
-
-// render to texture
-cyGLRenderTexture2D renderBuffer;
-int rb_width = 600;
-int rb_height = 600;
+GLuint plane_mv;
+GLuint plane_m_shadow;
 
 // shadow map
 cyGLSLProgram shadow_program;
 GLuint shadow_program_id;
-GLuint depth_map;
-GLuint shadow_mvp;
-GLuint shadow_matrix;
-GLuint frame_buffer;
-int shadow_width = 600;
-int shadow_height = 600;
+cyGLRenderDepth2D shadow_map;
+GLuint shadow_vao;
+GLuint shadow_mlp;
+int shadow_width = 2048;
+int shadow_height = 2048;
 
 
 // forward declarations
 void InitializeGLUT(int argc, char* argv[]);
+void CompileProgram();
 GLuint* BuildObjBuffers(int argc, const char* filename);
 GLuint BuildPlaneBuffers();
-void BuildDepthTexture();
-void CompileProgram();
+GLuint BuildShadowMap();
 void SetShaderVariables();
-void BuildRenderBuffer();
 cyMatrix4f GetModelViewProjection();
-cyMatrix4f GetPlaneModelViewProjection();
-cyMatrix4f GetModelViewNormal();
+cyMatrix4f GetModelView();
+cyMatrix4f GetModelLightProjection();
+cyMatrix4f GetModelShadow();
 
 #pragma endregion globals 
 
@@ -94,46 +83,28 @@ void resize(int w, int h) {
 }
 
 void draw() {
-	// obj render to texture
-	glUseProgram(obj_program_id);
-	renderBuffer.Bind();
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-
+	SetShaderVariables();
 	if (auto_rot_status) auto_rot += 0.02;
 
-	// calculate and set mvp/mvn matrix
-	float matrix[16];
-	float _mvn[16];
-	GetModelViewProjection().Get(matrix);
-	GetModelViewNormal().Get(_mvn);
-	glUniformMatrix4fv(obj_mvp, 1, false, matrix);
-	glUniformMatrix4fv(obj_mvn, 1, false, _mvn);
+	// render shadow map
+	shadow_map.Bind();
+	glUseProgram(shadow_program_id);
+	glBindVertexArray(shadow_vao);
+	glDrawArrays(GL_TRIANGLES, 0, num_v * sizeof(cyVec3f));
+	shadow_map.Unbind();
 
+	glClear(GL_DEPTH_BUFFER_BIT);
+	
+	// render object
+	glUseProgram(obj_program_id);
 	glBindVertexArray(obj_vao);
+	glDrawArrays(GL_TRIANGLES, 0, num_v * sizeof(cyVec3f));
 
-	// draw obj
-	glDrawArrays(GL_TRIANGLES, 0, num_f * 3 * sizeof(cyVec3f));
-
-	renderBuffer.Unbind();
-
-
-	// render buffer texture on plane
+	// render plane
 	glUseProgram(plane_program_id);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	float _p_mvp[16];
-	GetPlaneModelViewProjection().Get(_p_mvp);
-	glUniformMatrix4fv(plane_mvp, 1, false, _p_mvp);
-
-	GLuint rb_tex_loc = glGetUniformLocation(plane_program_id, "render_tex");
-	glUniform1i(rb_tex_loc, 0);
-	renderBuffer.BindTexture(0);
-
 	glBindVertexArray(plane_vao);
-
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	//Swap buffers
@@ -161,39 +132,20 @@ void mouseInput(int button, int state, int x, int y) {
 }
 
 void mouseMotion(int x, int y) {
-	int modifiers = glutGetModifiers();
 
-	if (modifiers == GLUT_ACTIVE_ALT) {
-		if (mouse_button == GLUT_LEFT_BUTTON) { // handle rotation
-			if (pry < y) plane_r_x += 0.02;
-			else if (pry > y) plane_r_x -= 0.02;
-			pry = y;
+	if (mouse_button == GLUT_LEFT_BUTTON) { // handle rotation
+		if (pry < y) obj_r_x += 0.02;
+		else if (pry > y) obj_r_x -= 0.02;
+		pry = y;
 
-			if (prx < x) plane_r_y += 0.02;
-			else if (prx > x) plane_r_y -= 0.02;
-			prx = x;
-		}
-		else if (mouse_button == GLUT_RIGHT_BUTTON) { // handle zooming
-			if (pzy < y) plane_t_z += 0.15; // zooming in 
-			else plane_t_z -= 0.15; // zoomng out
-			pzy = y;
-		}
+		if (prx < x) obj_r_y += 0.02;
+		else if (prx > x) obj_r_y -= 0.02;
+		prx = x;
 	}
-	else {
-		if (mouse_button == GLUT_LEFT_BUTTON) { // handle rotation
-			if (pry < y) obj_r_x += 0.02;
-			else if (pry > y) obj_r_x -= 0.02;
-			pry = y;
-
-			if (prx < x) obj_r_y += 0.02;
-			else if (prx > x) obj_r_y -= 0.02;
-			prx = x;
-		}
-		else if (mouse_button == GLUT_RIGHT_BUTTON) { // handle zooming
-			if (pzy < y) obj_t_z += 0.15; // zooming in 
-			else obj_t_z -= 0.15; // zoomng out
-			pzy = y;
-		}
+	else if (mouse_button == GLUT_RIGHT_BUTTON) { // handle zooming
+		if (pzy < y) obj_t_z += 0.15; // zooming in 
+		else obj_t_z -= 0.15; // zoomng out
+		pzy = y;
 	}
 	
 	glutPostRedisplay();
@@ -208,9 +160,7 @@ int main(int argc, char* argv[]) {
 	CompileProgram();
 	GLuint* obj_vbo = BuildObjBuffers(argc, argv[1]);
 	GLuint plane_vbo = BuildPlaneBuffers();
-	BuildDepthTexture();
-	SetShaderVariables();
-	BuildRenderBuffer();
+	GLuint shadow_vbo = BuildShadowMap();
 	
 	// start 
 	glutMainLoop();
@@ -219,6 +169,7 @@ int main(int argc, char* argv[]) {
 	glDeleteBuffers(1, &obj_vbo[1]);
 	glDeleteBuffers(1, &obj_vbo[2]);
 	glDeleteBuffers(1, &plane_vbo);
+	glDeleteBuffers(1, &shadow_vbo);
 
 	return 0;
 }
@@ -234,7 +185,7 @@ void InitializeGLUT(int argc, char* argv[]) {
 	glutInitContextFlags(GLUT_DEBUG);
 	glutInitWindowSize(display_width, display_height);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("CS 5610 Project 5");
+	glutCreateWindow("CS 5610 Project 7");
 
 	// key detection
 	glutKeyboardFunc(keyboard);
@@ -332,11 +283,16 @@ GLuint* BuildObjBuffers(int argc, const char* filename) {
 	glEnableVertexAttribArray(norm);
 	glVertexAttribPointer(norm, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
+	glUseProgram(obj_program_id);
+	obj_mvp = glGetUniformLocation(obj_program_id, "mvp");
+	obj_mv = glGetUniformLocation(obj_program_id, "mv");
+	obj_m_shadow = glGetUniformLocation(obj_program_id, "m_shadow");
+
 	return vbo;
 }
 
 GLuint BuildPlaneBuffers() {
-	static const GLfloat plane[] = { -1,-1,0,  1,-1,0,  -1,1,0,  -1,1,0,  1,-1,0,  1,1,0, };
+	static const GLfloat plane[] = { -30,-30,0,  30,-30,0,  -30,30,0,  -30,30,0,  30,-30,0,  30,30,0, };
 
 	GLuint plane_vbo;
 	glGenVertexArrays(1, &plane_vao);
@@ -349,57 +305,72 @@ GLuint BuildPlaneBuffers() {
 	glVertexAttribPointer(plane_pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(plane_pos);
 
+	glUseProgram(plane_program_id);
+	plane_mvp = glGetUniformLocation(plane_program_id, "mvp");
+	plane_mv = glGetUniformLocation(plane_program_id, "mv");
+	plane_m_shadow = glGetUniformLocation(plane_program_id, "m_shadow");
+
 	return plane_vbo;
 }
 
+GLuint BuildShadowMap() {
+	// setup shadowmap
+	shadow_map.Initialize(true, shadow_width, shadow_height);
+	shadow_map.SetTextureFilteringMode(GL_LINEAR, GL_LINEAR);
+
+	cyVec3f* v = new cyVec3f[num_f * 3];
+	for (int i = 0; i < num_f; i++) {
+		cyTriMesh::TriFace f = obj_mesh.F(i);
+		v[3 * i + 0] = obj_mesh.V(f.v[0]);
+		v[3 * i + 1] = obj_mesh.V(f.v[1]);
+		v[3 * i + 2] = obj_mesh.V(f.v[2]);
+	}
+
+	GLuint shadow_vbo;
+	glGenVertexArrays(1, &shadow_vao);
+	glBindVertexArray(shadow_vao);
+	glGenBuffers(1, &shadow_vbo);
+
+	glBindBuffer(GL_ARRAY_BUFFER, shadow_vbo);
+	glBufferData(GL_ARRAY_BUFFER, num_v * sizeof(cyVec3f), v, GL_STATIC_DRAW);
+	GLuint shadow_pos = glGetAttribLocation(plane_program_id, "pos");
+	glVertexAttribPointer(shadow_pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(shadow_pos);
+
+	glUseProgram(shadow_program_id);
+	shadow_mlp = glGetUniformLocation(plane_program_id, "mlp");
+
+	return shadow_vbo;
+}
 
 void SetShaderVariables() {
-	glUseProgram(obj_program_id);
+	float _mvp[16];
+	float _mv[16];
+	float _mlp[16];
+	float _m_shadow[16];
+	GetModelViewProjection().Get(_mvp);
+	GetModelView().Get(_mv);
+	GetModelLightProjection().Get(_mlp);
+	GetModelShadow().Get(_m_shadow);
 
-	// set uniform variables location
-	obj_mvp = glGetUniformLocation(obj_program_id, "mvp");	
-	obj_mvn = glGetUniformLocation(obj_program_id, "mvn");
+	glUseProgram(obj_program_id);
+	glUniformMatrix4fv(obj_mvp, 1, false, _mvp);
+	glUniformMatrix4fv(obj_mv, 1, false, _mv);
+	glUniformMatrix4fv(obj_m_shadow, 1, false, _m_shadow);
 
 	glUseProgram(plane_program_id);
-	plane_mvp = glGetUniformLocation(plane_program_id, "p_mvp");
-}
+	glUniformMatrix4fv(plane_mvp, 1, false, _mvp);
+	glUniformMatrix4fv(plane_mv, 1, false, _mv);
+	glUniformMatrix4fv(plane_m_shadow, 1, false, _m_shadow);
 
-void BuildRenderBuffer() {
-	// Initialize Render Buffer
-	renderBuffer.Initialize(true, 3, rb_width, rb_height);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		fprintf(stderr, "Error: render buffer incorrect");
-		exit(1);
-	}
-	renderBuffer.BuildTextureMipmaps();
-}
-
-void BuildDepthTexture() {
-	glGenTextures(1, &depth_map);
-	glBindTexture(GL_TEXTURE_2D, depth_map);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_height, shadow_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_map, 0);
-
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		fprintf(stderr, "Error: render buffer incorrect");
-		exit(1);
-	}
+	glUseProgram(shadow_program_id);
+	glUniformMatrix4fv(shadow_mlp, 1, false, _mlp);
 }
 
 cyMatrix4f GetModelViewProjection() {
 	// perspective projection matrix values
 	float fov = 3.145 * 40.0 / 180.0;
-	float aspect = rb_width / rb_height;
+	float aspect = display_width / display_height;
 	float n = 0.1f;
 	float f = obj_t_z + obj_t_z;
 
@@ -407,26 +378,33 @@ cyMatrix4f GetModelViewProjection() {
 	return (cyMatrix4f::Perspective(fov, aspect, n, f) * cyMatrix4f::Translation(cyVec3f(0, -5, obj_t_z))) * cyMatrix4f::RotationXYZ(obj_r_x, obj_r_y + auto_rot, 0);
 }
 
+cyMatrix4f GetModelView() {
+	// generate translation and rotation matrices then multiply them
+	return cyMatrix4f::Translation(cyVec3f(0, -5, obj_t_z)) * cyMatrix4f::RotationXYZ(obj_r_x, obj_r_y + auto_rot, 0);
+}
+
 cyMatrix4f GetModelLightProjection() {
-	// generate translation and rotation matrices then multiply them
-	return cyMatrix4f::Translation(cyVec3f(0, -5, obj_t_z)) * cyMatrix4f::RotationXYZ(obj_r_x, obj_r_y + auto_rot, 0);
-}
-
-cyMatrix4f GetModelViewNormal() {
-	// generate translation and rotation matrices then multiply them
-	return cyMatrix4f::Translation(cyVec3f(0, -5, obj_t_z)) * cyMatrix4f::RotationXYZ(obj_r_x, obj_r_y + auto_rot, 0);
-}
-
-
-cyMatrix4f GetPlaneModelViewProjection() {
+	// generate model to light space matrix
 	// perspective projection matrix values
-	float fov = 0.7;
-	float aspect = display_width / display_height;
+	cyVec3f light_pos = cyVec3f(5, 5, 5);
+	float fov = 3.145 * 40.0 / 180.0;
+	float aspect = shadow_width / shadow_height;
 	float n = 0.1f;
-	float f = plane_t_z * 2;
+	float f = light_pos.Length() * 2;
 
-	// generate perspective projection, translation, and rotation matrices and multiply them
-	return (cyMatrix4f::Perspective(fov, aspect, n, f) * cyMatrix4f::Translation(cyVec3f(0, 0, plane_t_z))) * cyMatrix4f::RotationXYZ(plane_r_x, plane_r_y, 0);
+	return (cyMatrix4f::Perspective(fov, aspect, n, f) * cyMatrix4f::View(light_pos, cyVec3f(0, 0, 0), cyVec3f(0, 1, 0)));
 }
+cyMatrix4f GetModelShadow() {
+	cyMatrix4f bias(
+		0.5, 0.0, 0.0, 0.0,
+		0.0, 0.5, 0.0, 0.0,
+		0.0, 0.0, 0.5, 0.0,
+		0.5, 0.5, 0.5, 1.0
+	);
+
+	return bias * GetModelLightProjection();
+}
+
+
 
 #pragma endregion Helper_Functions
