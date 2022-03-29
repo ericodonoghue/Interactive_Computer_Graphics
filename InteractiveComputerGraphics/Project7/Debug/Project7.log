@@ -1,5 +1,4 @@
 ﻿  main.cpp
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(18,24): warning C4305: 'initializing': truncation from 'double' to 'float'
 D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(80,18): warning C4244: '=': conversion from 'int' to 'GLfloat', possible loss of data
 D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(81,19): warning C4244: '=': conversion from 'int' to 'GLfloat', possible loss of data
 D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(89,39): warning C4305: '+=': truncation from 'double' to 'float'
@@ -11,8 +10,13 @@ D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\
 D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(147,23): warning C4305: '-=': truncation from 'double' to 'float'
 D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(186,36): warning C4244: 'argument': conversion from 'GLfloat' to 'int', possible loss of data
 D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(186,21): warning C4244: 'argument': conversion from 'GLfloat' to 'int', possible loss of data
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(372,34): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(390,34): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(391,15): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(380,34): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(398,34): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(399,15): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(405,101): warning C4305: 'argument': truncation from 'double' to 'T'
+          with
+          [
+              T=float
+          ]
 D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Project7\main.cpp(291): warning C4172: returning address of local variable or temporary: vbo
   Project7.vcxproj -> D:\U of U\senior\fall 2021\computer graphics\5610\interactive_computer_graphics\InteractiveComputerGraphics\Debug\Project7.exe

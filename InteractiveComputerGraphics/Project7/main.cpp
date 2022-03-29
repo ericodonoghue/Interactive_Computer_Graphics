@@ -14,8 +14,8 @@
 
 
 // rotation and zoom with mouse
-float obj_t_z = -48;
-float obj_r_x = -1.5708;
+float obj_t_z = -200;
+float obj_r_x = -1;
 float obj_r_y = 0;
 
 // keeps track of the previous position of the mouse for zoom/rotation direction
@@ -96,7 +96,7 @@ void draw() {
 	shadow_map.Unbind();
 
 	glClear(GL_DEPTH_BUFFER_BIT);
-	
+
 	// render object
 	glUseProgram(obj_program_id);
 	glBindVertexArray(obj_vao);
@@ -147,7 +147,7 @@ void mouseMotion(int x, int y) {
 		else obj_t_z -= 0.15; // zoomng out
 		pzy = y;
 	}
-	
+
 	glutPostRedisplay();
 }
 
@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
 	GLuint* obj_vbo = BuildObjBuffers(argc, argv[1]);
 	GLuint plane_vbo = BuildPlaneBuffers();
 	GLuint shadow_vbo = BuildShadowMap();
-	
+
 	// start 
 	glutMainLoop();
 
@@ -240,7 +240,7 @@ GLuint* BuildObjBuffers(int argc, const char* filename) {
 
 	// read vertex data
 	bool r;
-	
+
 	if (!(r = obj_mesh.LoadFromFileObj(filename))) {
 		fprintf(stderr, "Error: cannot read file");
 		exit(1);
@@ -292,7 +292,7 @@ GLuint* BuildObjBuffers(int argc, const char* filename) {
 }
 
 GLuint BuildPlaneBuffers() {
-	static const GLfloat plane[] = { -30,-30,0,  30,-30,0,  -30,30,0,  -30,30,0,  30,-30,0,  30,30,0, };
+	static const GLfloat plane[] = { -60,-60,0,  60,-60,0,  -60,60,0,  -60,60,0,  60,-60,0,  60,60,0, };
 
 	GLuint plane_vbo;
 	glGenVertexArrays(1, &plane_vao);
@@ -325,6 +325,14 @@ GLuint BuildShadowMap() {
 		v[3 * i + 1] = obj_mesh.V(f.v[1]);
 		v[3 * i + 2] = obj_mesh.V(f.v[2]);
 	}
+	static const cyVec3f p[] = { cyVec3f(-60,-60,0),  cyVec3f(60,-60,0), cyVec3f(-60,60,0),  cyVec3f(-60,60,0),  cyVec3f(60,-60,0),  cyVec3f(60,60,0) };
+
+	const int m = sizeof(v) / sizeof(v[0]);
+	const int n = sizeof(p) / sizeof(p[0]);
+
+	cyVec3f arr[m + n];
+	std::copy(v, v + m, arr);
+	std::copy(p, p + n, arr + m);
 
 	GLuint shadow_vbo;
 	glGenVertexArrays(1, &shadow_vao);
@@ -332,13 +340,13 @@ GLuint BuildShadowMap() {
 	glGenBuffers(1, &shadow_vbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, shadow_vbo);
-	glBufferData(GL_ARRAY_BUFFER, num_v * sizeof(cyVec3f), v, GL_STATIC_DRAW);
-	GLuint shadow_pos = glGetAttribLocation(plane_program_id, "pos");
+	glBufferData(GL_ARRAY_BUFFER, sizeof(arr), &arr, GL_STATIC_DRAW);
+	GLuint shadow_pos = glGetAttribLocation(shadow_program_id, "pos");
 	glVertexAttribPointer(shadow_pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(shadow_pos);
 
 	glUseProgram(shadow_program_id);
-	shadow_mlp = glGetUniformLocation(plane_program_id, "mlp");
+	shadow_mlp = glGetUniformLocation(shadow_program_id, "mlp");
 
 	return shadow_vbo;
 }
@@ -386,13 +394,16 @@ cyMatrix4f GetModelView() {
 cyMatrix4f GetModelLightProjection() {
 	// generate model to light space matrix
 	// perspective projection matrix values
-	cyVec3f light_pos = cyVec3f(5, 5, 5);
+	cyVec3f light_pos = cyVec3f(30, 0, -10);
 	float fov = 3.145 * 40.0 / 180.0;
 	float aspect = shadow_width / shadow_height;
-	float n = 0.1f;
-	float f = light_pos.Length() * 2;
+	float n = 30;
+	float f = 150;
 
-	return (cyMatrix4f::Perspective(fov, aspect, n, f) * cyMatrix4f::View(light_pos, cyVec3f(0, 0, 0), cyVec3f(0, 1, 0)));
+	// figure out large teapot is and figure out where it is (take average)
+
+	return (cyMatrix4f::Perspective(fov, aspect, n, f) * cyMatrix4f::View(light_pos, cyVec3f(0.2, 10, 9), cyVec3f(0, 1, 0)));
+	//return (cyMatrix4f::Perspective(fov, aspect, n, f) * cyMatrix4f::Translation(light_pos)) * cyMatrix4f::RotationXYZ(obj_r_x, obj_r_y + auto_rot, 0);
 }
 cyMatrix4f GetModelShadow() {
 	cyMatrix4f bias(
@@ -404,7 +415,6 @@ cyMatrix4f GetModelShadow() {
 
 	return bias * GetModelLightProjection();
 }
-
 
 
 #pragma endregion Helper_Functions

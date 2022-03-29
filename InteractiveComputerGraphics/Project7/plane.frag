@@ -10,7 +10,7 @@ out vec4 color;
 
 void main()
 {
-	vec3 light_dir = normalize(vec3(1,1,5));
+	vec3 light_dir = normalize(vec3(30,40,-30));
 	float alpha = 18.0;
 
 	vec3 v = vec3(normalize(frag_pos)) * vec3(-1,-1,-1);
@@ -19,12 +19,12 @@ void main()
 	float cos_theta = dot(normalize(frag_norm), light_dir);
 	float cos_phi = dot(normalize(frag_norm), h);
 
-	vec3 I = vec3(1,1,1);
+	vec3 I = vec3(1,1,1); //* textureProj(shadow_map, lightview_pos);
 	vec3 K_s = vec3(1,1,1);
 	vec3 K_d = vec3(0.8,0,0);
 
 	vec4 c = vec4(I * ( (cos_theta * K_d) + (K_s * pow(cos_phi, alpha)) ),1);
 	c = vec4(0.1,0.1,0.1,1);
 
-	color = c * textureProj(shadow_map, lightview_pos);
+	color = c * textureProj(shadow_map, lightview_pos);;
 }
