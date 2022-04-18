@@ -45,6 +45,10 @@ GLuint cube_mvp_loc;
 GLuint cube_color_loc;
 GLuint cube_vao;
 
+//Text
+cyGLSLProgram text_prog;
+GLuint text_prog_id;
+
 std::vector<cyVec3f> object_positions = { 
 	cyVec3f(-3.0, -0.5, -3.0), cyVec3f(0.0, -0.5, -3.0), cyVec3f(3.0, -0.5, -3.0), 
 	cyVec3f(-3.0, -0.5, 0.0),  cyVec3f(0.0, -0.5, 0.0),  cyVec3f(3.0, -0.5, 0.0), 
@@ -118,6 +122,7 @@ void LightingPass()
 	}
 	glUniform3f(camera_pos_loc, camx, camy, camz);
 
+	// finally render quad
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
@@ -145,8 +150,9 @@ void CubePass()
 
 void TextPass()
 {
-	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos2f(-0.98, 0.94);
+	glUseProgram(text_prog_id);
+	glColor3f(1.0, 1.0, 1.0); 
+	glRasterPos2f(0, 0);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)"'left arrow' - increase lights by 4 & re-seed");
 	glRasterPos2f(-0.98, 0.88);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)"'right arrow' - decrease lights by 4 & re-seed");
@@ -163,7 +169,7 @@ void Draw() {
 	GeometryPass();
 	LightingPass();
 	CubePass();
-	TextPass();
+	//TextPass();
 	glutSwapBuffers();
 }
 
@@ -174,12 +180,12 @@ void GenerateRandomLights()
 	light_colors.clear();
 	for (unsigned int i = 0; i < num_lights; i++)
 	{
-		// calculate random offsets
+		// calculate slightly random offsets
 		float xPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
 		float yPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 4.0);
 		float zPos = static_cast<float>(((rand() % 100) / 100.0) * 6.0 - 3.0);
 		light_positions.push_back(cyVec3f(xPos, yPos, zPos));
-		// calculate random color
+		// also calculate random color
 		float rColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5);
 		float gColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5);
 		float bColor = static_cast<float>(((rand() % 100) / 200.0f) + 0.5);
@@ -279,6 +285,13 @@ void CompilePrograms()
 	}
 	cube_prog_id = cube_prog.GetID();
 	cube_prog.Bind();
+
+	// Setup Text Pass Program
+	if (!text_prog.BuildFiles("text.vert", "text.frag")) {
+		fprintf(stderr, "Something went wrong loading the cube program."); exit(1);
+	}
+	text_prog_id = text_prog.GetID();
+	text_prog.Bind();
 }
 
 void LoadObjectAndInitializeObjectBuffers()
@@ -481,7 +494,6 @@ void InitializeObjectTextures()
 	CreateTexture("diffuse.png", diffuse_id, 3);
 	CreateTexture("specular.png", specular_id, 4);
 }
-
 
 int main(int argc, char* argv[]) {
 	srand(13);

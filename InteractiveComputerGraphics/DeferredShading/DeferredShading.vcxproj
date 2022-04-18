@@ -165,6 +165,8 @@
     <None Include="geometry.vert" />
     <None Include="lighting.frag" />
     <None Include="lighting.vert" />
+    <None Include="text.frag" />
+    <None Include="text.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lodepng.cpp" />
