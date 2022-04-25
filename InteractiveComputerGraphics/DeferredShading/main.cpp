@@ -151,16 +151,15 @@ void CubePass()
 void TextPass()
 {
 	glUseProgram(text_prog_id);
-	glColor3f(1.0, 1.0, 1.0); 
-	glRasterPos2f(0, 0);
+	glWindowPos2d(10, display_height - 15);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)"'left arrow' - increase lights by 4 & re-seed");
-	glRasterPos2f(-0.98, 0.88);
+	glWindowPos2d(10, display_height - 30);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)"'right arrow' - decrease lights by 4 & re-seed");
-	glRasterPos2f(-0.98, 0.82);
+	glWindowPos2d(10, display_height - 45);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)"'spacebar' - re-seed random lights");
-	glRasterPos2f(-0.98, 0.76);
+	glWindowPos2d(10, display_height - 60);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)"'r' - enable camera auto movement");
-	glRasterPos2f(-0.98, 0.70);
+	glWindowPos2d(10, display_height - 75);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)"'e' - reset camera");
 }
 
@@ -169,7 +168,7 @@ void Draw() {
 	GeometryPass();
 	LightingPass();
 	CubePass();
-	//TextPass();
+	TextPass();
 	glutSwapBuffers();
 }
 
